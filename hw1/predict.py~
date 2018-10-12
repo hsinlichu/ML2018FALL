@@ -74,6 +74,7 @@ def main(argv):
     result = predict(testingData,w,HOURS,select)
     for i in range(len(result)):
         writeText += "id_" + str(i) + "," + str(result[i][0]) + "\n"
+    os.makedirs(os.path.dirname(output), exist_ok=True)
     with open(output, "w") as f:
         f.write(writeText)
 

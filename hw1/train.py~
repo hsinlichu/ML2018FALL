@@ -1,10 +1,10 @@
 import sys,os
 import numpy as np
-#from numpy.linalg import inv
+from numpy.linalg import inv
 import csv
-#import matplotlib
-#matplotlib.use('agg')
-#import pylab as plt
+import matplotlib
+matplotlib.use('agg')
+import pylab as plt
 
 def shuffle(a, b):
     p = np.random.permutation(len(a))
@@ -149,12 +149,12 @@ def adagrad(traingData, predict, LEARNING_RATE, ITERATION, HOURS, LAMDA):
         history.append(current_loss)
         print('\rIteration: {}, Loss: {}'.format(str(index+1), current_loss), end='' ,flush=True)
     print()
-    #plt.plot(xaxis[3:],history[3:])
-    #plt.xlabel("x-axis")
-    #plt.ylabel("y-axis")
-    #plt.title("Loss")
-    #plt.grid(True)
-    #plt.savefig('Loss.jpg')
+    plt.plot(xaxis[3:],history[3:])
+    plt.xlabel("x-axis")
+    plt.ylabel("y-axis")
+    plt.title("Loss")
+    plt.grid(True)
+    plt.savefig('Loss.jpg')
     return np.concatenate((np.array([[b]]), w))
 
 
