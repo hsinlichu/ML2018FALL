@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 import sys
 import csv
 from keras.utils import np_utils
@@ -23,13 +22,13 @@ print("test",test.shape)
 name = "bagging{}.h5".format(0)
 print(name)
 model = load_model(name)
-y = model.predict(test, batch_size=256, verbose=1)
+y = model.predict(test, batch_size=512, verbose=1)
 
-for i in [4,9]:
+for i in [1,3,4,5,6,7,8,9]:
     name = "bagging{}.h5".format(i)
     model = load_model("bagging{}.h5".format(i))
     print(name)
-    y += model.predict(test, batch_size=256, verbose=1)
+    y += model.predict(test, batch_size=512, verbose=1)
 
 out = [['id','label']]
 for index,ans in enumerate(y):
