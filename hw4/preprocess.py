@@ -5,7 +5,7 @@ import csv
 import pickle
 import numpy as np
 import re
-import os
+import os,sys
 import gensim
 
 dictionary = sys.argv[1]
