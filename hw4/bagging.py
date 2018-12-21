@@ -54,7 +54,7 @@ test_x = np.array(test_x)
 y_test = np.zeros((len(test_x),1))
 for i in modellist:
     feature = "model" + str(i)
-    rnn_model_name = os.path.join(feature,'rnn.h5')
+    rnn_model_name = os.path.join(processed_data,feature,'rnn.h5')
     print(rnn_model_name)
     predict_model = load_model(rnn_model_name)
     y_test += predict_model.predict(test_x,batch_size=BATCH_SIZE, verbose=1)
