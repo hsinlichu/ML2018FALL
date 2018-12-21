@@ -84,7 +84,7 @@ train_x = wordfilter(train_jieba,stopWords)
 test_x = wordfilter(test_jieba,stopWords)
 
 whole = train_x + test_x
-wvmodel = Word2Vec(whole,size=EMBEDDING_DIM,min_count=5,window=5, workers=10,iter=20)
+wvmodel = Word2Vec(whole,size=EMBEDDING_DIM,min_count=5,window=5, workers=10,iter=50)
 print("Word2Vec",wvmodel)
 words = list(wvmodel.wv.vocab)
 print("words len",len(words))
