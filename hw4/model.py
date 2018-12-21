@@ -37,7 +37,7 @@ print("Save in {}".format(feature))
 if not os.path.exists(feature):
     os.makedirs(feature)
 
-processed_data = "processed"#"no_stopword_iter50"
+processed_data = "."#"no_stopword_iter50"
 rnn_model_name = os.path.join(feature,'rnn.h5')
 token_name = os.path.join(processed_data,'tokenizer.pkl')
 wvmodel_name =os.path.join(processed_data,"w2vmodel.bin")
