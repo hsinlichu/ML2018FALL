@@ -31,38 +31,28 @@ ktf.set_session(get_session())
 
 
 para = sys.argv[1]
-feature = "new_" + para
+feature = "checkpoint" + para
 print("Save in {}".format(feature))
-graphdir = "log2"
 
-if not os.path.exists(graphdir):
-    os.makedirs(graphdir)
 if not os.path.exists(feature):
     os.makedirs(feature)
 
-processed_data = "no_stopword_iter50"#"no_stopword_iter50"
+processed_data = "processed"#"no_stopword_iter50"
 rnn_model_name = os.path.join(feature,'rnn.h5')
 token_name = os.path.join(processed_data,'tokenizer.pkl')
 wvmodel_name =os.path.join(processed_data,"w2vmodel.bin")
-logdir = os.path.join(graphdir,feature)
 
-train_y_name = "train_y.csv"
+train_y_name = sys.argv[2]
 
 EMBEDDING_DIM = 256
 BATCH_SIZE = 512
 MAX_LENGTH = 64
 
-if not os.path.exists(logdir):
-    os.makedirs(logdir)
 
 raw_x = []
 with open(os.path.join(processed_data,"train_x_processed.plk"),"rb") as f:
     raw_x = pickle.load(f)
-'''
-test_x = []
-with open(os.path.join(processed_data,"test_x_processed.plk"),"rb") as f:
-    test_x = pickle.load(f)
-''' 
+
 raw_y = None
 with open(train_y_name,"r") as fin:
     raw_y = list(csv.reader(fin))[1:][:]
@@ -72,23 +62,6 @@ print("raw_x",len(raw_x))
 print("raw_y",len(raw_y))
 #print("test_x",len(test_x))
 
-'''
-whole = raw_x + test_x
-wvmodel = Word2Vec(whole,size=EMBEDDING_DIM, workers=8,iter=50)
-print("Word2Vec",wvmodel)
-words = list(wvmodel.wv.vocab)
-print("words len",len(words))
-
-
-# save model
-wvmodel.save(wvmodel_name)
-
-t = Tokenizer()
-t.fit_on_texts(raw_x)
-
-with open(token_name, 'wb') as handle:
-    pickle.dump(t, handle)
-'''
 
 # load data
 wvmodel = Word2Vec.load(wvmodel_name)
@@ -132,16 +105,6 @@ for word, i in t.word_index.items():
         tmp += 1
         embedding_matrix[i] = embedding_matrix[0]
 
-print("{} word not in word2vec model".format(tmp))
-meta_file = "w2v_metadata.tsv"
-word2idx_sorted = [(k, word2idx[k]) for k in sorted(word2idx, key = word2idx.get, reverse = False)]
-with open(os.path.join(logdir, meta_file), 'w+') as file_metadata:
-    for word in word2idx_sorted:
-        if word[0] == '':
-            print("Emply Line, should replecaed by any thing else, or will cause a bug of tensorboard")
-            file_metadata.write('<Empty Line>' + '\n')
-        else:
-            file_metadata.write(word[0] + '\n') # save model wvmodel.save(wvmodel_name) 
 embedding_layer = Embedding(vocab_size,EMBEDDING_DIM,weights=[embedding_matrix],input_length=MAX_LENGTH,trainable=False)
 
 rnn = Sequential()
@@ -172,10 +135,8 @@ rnn.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
 rnn.summary()
 
 checkpoint = ModelCheckpoint(rnn_model_name, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
-tbcallBack = TensorBoard(log_dir=logdir, histogram_freq=0, write_graph=True, write_images=True,embeddings_freq = 1,embeddings_layer_names = None,embeddings_metadata = meta_file)
-#early_stopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=8, verbose=0, mode='auto')
 duration = -time.time()
-rnn.fit(train_x, train_y, validation_data=(val_x,val_y),callbacks = [checkpoint,tbcallBack],epochs=50, batch_size=BATCH_SIZE, verbose=1)
+rnn.fit(train_x, train_y, validation_data=(val_x,val_y),callbacks = [checkpoint],epochs=50, batch_size=BATCH_SIZE, verbose=1)
 duration += time.time()
 print("Training time:{}(s)".format(duration))
 

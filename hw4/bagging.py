@@ -22,19 +22,20 @@ import sys
 
 
 EMBEDDING_DIM = 256
-BATCH_SIZE = 256
+BATCH_SIZE = 512
 MAX_LENGTH = 64
-feature = sys.argv[2]
 
-rnn_model_name = os.path.join(feature,'rnn.h5')
-token_name = os.path.join(feature,'tokenizer.pkl')
-wvmodel_name =os.path.join(feature,"w2vmodel.bin")
-processed_data = "no_stopword"
+modellist = [0,3,7,9]
+
+save_name = sys.argv[1]
+processed_data = "model"
+token_name = os.path.join(processed_data,'tokenizer.pkl')
+wvmodel_name =os.path.join(processed_data,"w2vmodel.bin")
 
 
 
 test_x = []
-with open(os.path.join(processed_data,"test_x_processed.plk"),"rb") as f:
+with open("test_x_processed.plk","rb") as f:
     test_x = pickle.load(f)
 test_x = [" ".join(s) for s in test_x]
  
@@ -43,18 +44,23 @@ model = Word2Vec.load(wvmodel_name)
 #t = Tokenizer()
 t = pickle.load(open(token_name,'rb'))
 vocab_size = len(t.word_index) + 1
-print (vocab_size)
-print (len(test_x))
+print ("vocab_size",vocab_size)
+print ("test_x length",len(test_x))
 
 test_x = t.texts_to_sequences(test_x)
 test_x = pad_sequences(test_x,maxlen=MAX_LENGTH,padding='post')
 test_x = np.array(test_x)
 
-predict_model = load_model(rnn_model_name)
-predict_model.summary()
-y_test = predict_model.predict(test_x,batch_size=BATCH_SIZE, verbose=1)
+y_test = np.zeros((len(test_x),1))
+for i in modellist:
+    feature = "model" + str(i)
+    rnn_model_name = os.path.join(feature,'rnn.h5')
+    print(rnn_model_name)
+    predict_model = load_model(rnn_model_name)
+    y_test += predict_model.predict(test_x,batch_size=BATCH_SIZE, verbose=1)
+y_test /= len(modellist)
 
-with open(sys.argv[1],'w') as fout:
+with open(save_name,'w') as fout:
     writer = csv.writer(fout)
     writer.writerow(["id","label"])
     for i in range(len(y_test)):
