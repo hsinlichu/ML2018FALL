@@ -16,7 +16,7 @@ BATCH_SIZE = 512
 MAX_LENGTH = 64
 
 
-feature = "precessed"
+feature = "processed"
 if not os.path.exists(feature):
     os.makedirs(feature)
 
